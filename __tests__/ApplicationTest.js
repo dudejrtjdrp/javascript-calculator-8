@@ -40,4 +40,19 @@ describe("문자열 계산기", () => {
 
     await expect(app.run()).rejects.toThrow("[ERROR]");
   });
+
+  test("process.exit 호출 여부 확인", async () => {
+    const inputs = ["//;\\n1;2;3"];
+    mockQuestions(inputs);
+
+    const exitSpy = jest.spyOn(process, "exit").mockImplementation(() => {});
+
+    const app = new App();
+    await app.run();
+
+    // process.exit가 호출되지 않았는지 확인
+    expect(exitSpy).not.toHaveBeenCalled();
+
+    exitSpy.mockRestore();
+  });
 });
