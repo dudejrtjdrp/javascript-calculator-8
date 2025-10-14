@@ -6,7 +6,7 @@ class App {
   async run() {
     try {
       const input = await InputHandler.read();
-      const result = StringCalculator.default(input)
+      const result = StringCalculator.calculate(input);
       OutputHandler.print(result);
     } catch (error) {
       OutputHandler.printError(error);
