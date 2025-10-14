@@ -1,6 +1,6 @@
-import StringCalculator from "./calculator/stringCalculator";
-import InputHandler from "./view/inputHandler";
-import OutputHandler from "./view/outputHandler";
+import StringCalculator from "./calculator/stringCalculator.js";
+import InputHandler from "./view/inputHandler.js";
+import OutputHandler from "./view/outputHandler.js";
 
 class App {
   async run() {
