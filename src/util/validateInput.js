@@ -1,4 +1,8 @@
-import { CUSTOM_CHECKED_DELIMITER } from "./constants.js";
+import {
+  CUSTOM_CHECKED_DELIMITER,
+  DEFAULT_CHECKED_DELIMITER,
+  EXCEPTION_NEWLINE,
+} from "./constants.js";
 
 class ValidateInput {
   static custom(input) {
@@ -12,6 +16,16 @@ class ValidateInput {
     if (delimiter === "") {
       throw new Error("커스텀 구분자가 빈 문자열입니다.");
     }
+
+    // const hasDelimiterNumber = /\d/.test(delimiter);
+    // if (hasDelimiterNumber) {
+    //   throw new Error("커스텀 구분자에는 숫자가 들어갈수 없습니다.");
+    // }
+
+    // const countNewline = input.split(EXCEPTION_NEWLINE).length - 1;
+    // if (countNewline > 1) {
+    //   throw new Error("개행문자는 커스텀 구분자가 될수 없습니다.");
+    // }
   }
   static default(input) {
     if (/[^0-9,:]/.test(input) || DEFAULT_CHECKED_DELIMITER.test(input)) {
