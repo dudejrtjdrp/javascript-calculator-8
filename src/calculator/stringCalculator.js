@@ -1,56 +1,53 @@
+import ValidateInput from "../util/validateInput.js";
+import {
+  CUSTOM_CHECKED_DELIMITER,
+  EXCEPTION_NEWLINE,
+} from "../util/constants.js";
+import FindSecondLastIndex from "../util/findSecondLastIndex.js";
+import FindLastNumberBeforeDelimiter from "../util/findLastNumberBeforeDelimiter.js";
+import FindPattern from "../util/findPattern.js";
+
 class StringCalculator {
   static customCalculate(input) {
-    let sum = 0;
-    let numbersArray = [];
     input = input.replace(/\\n/g, "\n").slice(2);
+    let numbersArray = [];
 
-    const regex = /^([\s\S]+?)\n([\s\S]*)$/;
-    const match = input.match(regex);
-
-    if (!match) {
-      throw new Error("입력 형식이 올바르지 않습니다.");
-    }
-
+    const match = input.match(CUSTOM_CHECKED_DELIMITER);
     const delimiter = match[1];
-    numbersArray = match[2].split(delimiter);
-    if (delimiter === "") {
-      throw new Error("커스텀 구분자가 빈 문자열입니다.");
+    const hasDelimiterNumber = /\d/.test(delimiter);
+    const countNewline = input.split(EXCEPTION_NEWLINE).length - 1;
+    if (hasDelimiterNumber && !countNewline) {
+      console.log(delimiter);
+      numbersArray = FindLastNumberBeforeDelimiter.find(
+        numbersArray,
+        numbers,
+        delimiter
+      );
+      return numbersArray;
+    }
+    ValidateInput.custom(input);
+    numbersArray = FindPattern.find(input);
+    return numbersArray;
+  }
+  static defaultCalculate(input) {
+    ValidateInput.default(input);
+    const numbersArray = input.split(/,|:/);
+    return numbersArray;
+  }
+  static calculate(input) {
+    if (!input) return 0;
+
+    let numbersArray = [];
+    if (input.startsWith("//")) {
+      numbersArray = this.customCalculate(input);
+    } else {
+      numbersArray = this.defaultCalculate(input);
     }
 
-    sum = numbersArray.reduce((acc, n) => {
+    const sum = numbersArray.reduce((acc, n) => {
       if (isNaN(n)) throw new Error("입력 형식이 올바르지 않습니다.");
       return acc + Number(n);
     }, 0);
-    //   for (let i = 0; i <= numbersArray.length - 1; i++) {
-    //     if (isNaN(numbersArray[i])) {
-    //       throw new Error("입력 형식이 올바르지 않습니다.");
-    //     }
-    //     sum += Number(numbersArray[i]);
-    //   }
-    return sum;
-  }
-  static calculate(input) {
-    let sum = 0;
-    let numbersArray = [];
-
-    if (!input) return 0;
-
-    if (input.startsWith("//")) {
-      return this.customCalculate(input)
-    }
-
-    const CHECKED_DELIMITER = /([,:]{2,})|^[,:]|[,:]$/;
-    if (/[^0-9,:]/.test(input) || CHECKED_DELIMITER.test(input)) {
-      throw new Error("[ERROR] 잘못된 구분자입니다.");
-    }
-
-    numbersArray = input.split(/,|:/);
-    const checkNegativeNumbers = numbersArray.filter((n) => n < 0);
-    if (checkNegativeNumbers.length != 0) {
-      throw new Error("[ERROR] 음수는 허용되지 않습니다.");
-    }
-
-    sum = numbersArray.reduce((acc, n) => acc + Number(n), 0);
     return sum; // 기본 구분자 사용
   }
 }
