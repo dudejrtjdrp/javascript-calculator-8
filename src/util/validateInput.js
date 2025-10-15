@@ -5,29 +5,26 @@ import {
 } from "./constants.js";
 
 class ValidateInput {
+  static common(input) {
+    if (!/\d/.test(input.at(-1))) {
+      throw new Error("[ERROR] 입력 형식이 올바르지 않습니다.");
+    }
+  }
   static custom(input) {
+    this.common(input);
     const match = input.match(CUSTOM_CHECKED_DELIMITER);
 
     if (!match) {
-      throw new Error("입력 형식이 올바르지 않습니다.");
+      throw new Error("[ERROR] 입력 형식이 올바르지 않습니다.");
     }
 
     const delimiter = match[1];
     if (delimiter === "") {
-      throw new Error("커스텀 구분자가 빈 문자열입니다.");
+      throw new Error("[ERROR] 커스텀 구분자가 빈 문자열입니다.");
     }
-
-    // const hasDelimiterNumber = /\d/.test(delimiter);
-    // if (hasDelimiterNumber) {
-    //   throw new Error("커스텀 구분자에는 숫자가 들어갈수 없습니다.");
-    // }
-
-    // const countNewline = input.split(EXCEPTION_NEWLINE).length - 1;
-    // if (countNewline > 1) {
-    //   throw new Error("개행문자는 커스텀 구분자가 될수 없습니다.");
-    // }
   }
   static default(input) {
+    this.common(input);
     if (/[^0-9,:]/.test(input) || DEFAULT_CHECKED_DELIMITER.test(input)) {
       throw new Error("[ERROR] 잘못된 구분자입니다.");
     }

@@ -3,7 +3,6 @@ class FindLastNumberBeforeDelimiter {
     for (let i = 0; i < numbers.length; i++) {
       if (i == numbers.length - 1) {
         numbersArray.push(numbers);
-        console.log(numbersArray);
         return numbersArray;
       }
       const isAnotherNumber =
