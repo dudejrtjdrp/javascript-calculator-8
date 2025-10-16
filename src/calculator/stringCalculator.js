@@ -3,21 +3,22 @@ import {
   CUSTOM_CHECKED_DELIMITER,
   EXCEPTION_NEWLINE,
 } from "../util/constants.js";
-import FindSecondLastIndex from "../util/findSecondLastIndex.js";
 import FindLastNumberBeforeDelimiter from "../util/findLastNumberBeforeDelimiter.js";
 import FindPattern from "../util/findPattern.js";
 
 class StringCalculator {
   static customCalculate(input) {
     input = input.replace(/\\n/g, "\n").slice(2);
+    ValidateInput.custom(input);
+    console.log(ValidateInput.custom(input))
     let numbersArray = [];
 
     const match = input.match(CUSTOM_CHECKED_DELIMITER);
     const delimiter = match[1];
+    const numbers = match[2];
     const hasDelimiterNumber = /\d/.test(delimiter);
     const countNewline = input.split(EXCEPTION_NEWLINE).length - 1;
-    if (hasDelimiterNumber && !countNewline) {
-      console.log(delimiter);
+    if (hasDelimiterNumber && countNewline == 1) {
       numbersArray = FindLastNumberBeforeDelimiter.find(
         numbersArray,
         numbers,
@@ -25,7 +26,6 @@ class StringCalculator {
       );
       return numbersArray;
     }
-    ValidateInput.custom(input);
     numbersArray = FindPattern.find(input);
     return numbersArray;
   }
@@ -45,7 +45,7 @@ class StringCalculator {
     }
 
     const sum = numbersArray.reduce((acc, n) => {
-      if (isNaN(n)) throw new Error("입력 형식이 올바르지 않습니다.");
+      if (isNaN(n)) throw new Error(INVALID_FORMAT_ERROR);
       return acc + Number(n);
     }, 0);
     return sum; // 기본 구분자 사용

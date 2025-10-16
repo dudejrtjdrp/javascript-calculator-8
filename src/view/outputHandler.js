@@ -1,4 +1,4 @@
-import { Console } from '@woowacourse/mission-utils';
+import { Console } from "@woowacourse/mission-utils";
 
 class OutputHandler {
   static print(result) {
@@ -6,7 +6,7 @@ class OutputHandler {
   }
 
   static printError(error) {
-    throw error;
+    Console.print(`${error.message}`);
   }
 }
 
