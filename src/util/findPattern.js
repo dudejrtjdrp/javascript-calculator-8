@@ -1,74 +1,72 @@
-import { EXCEPTION_NEWLINE } from "./constants.js";
+import FindLastNumber from "./findLastNumber.js";
 
-class FindPattern {
-  static splitByPatternHelper(s, pattern, result) {
-    if (!s) return;
-
-    const index = s.indexOf(pattern);
-    if (index === -1) {
-      result.push(s);
-      return;
-    }
-
-    const head = s.slice(0, index);
-    const tail = s.slice(index + pattern.length);
-
-    if (head.length > 0) result.push(head);
-
-    this.splitByPatternHelper(tail, pattern, result); // 재귀 호출
+class FindPatternTest {
+  static checkFinalArray(input, numberArray, pattern) {}
+  static splitByPattern(input, pattern) {
+    if (!input) return [];
+    return input.split(pattern);
   }
-
-  static splitByPattern(string, pattern) {
-    if (!string) return [];
-
-    const result = [];
-    this.splitByPatternHelper(string, pattern, result);
-    console.log(result);
-    return result;
-  }
-
   static find(input) {
-    console.log(input);
-    console.log("//\n\n1\n2\n3".split("\n"));
     let bestArray = null;
     let bestMaxLength = Infinity;
     let bestArrayLength = -1;
     let delimiter = "";
+    let notPattern = "";
 
     for (let len = 1; len <= input.length; len++) {
       const pattern = input.slice(0, len);
       let candidateArray = this.splitByPattern(input, pattern);
 
+      if (!candidateArray || candidateArray.length === 0) continue;
+
+      if (candidateArray.filter((item) => item === "").length >= 3) {
+        notPattern = pattern;
+        continue;
+      }
+
+      // 0️⃣ 앞쪽 빈칸 제거 (숫자 나올 때까지)
+      while (candidateArray.length > 0 && candidateArray[0].trim() === "") {
+        candidateArray.shift();
+      }
+
       if (candidateArray.length === 0) continue;
 
-      if (
-        len < 2 &&
-        candidateArray[0] !== "" &&
-        !/^\n+/.test(candidateArray[0])
-      )
-        continue;
+      const firstElement = candidateArray[0];
 
-      candidateArray = candidateArray.filter((s) => s.length > 0);
+      // 0번째 요소: 숫자 또는 \n+숫자
+      const firstValid = /^\n?\d/.test(firstElement);
+      if (!firstValid) continue;
+      // 1번째 이후 요소 검증
+      let isValid = true;
+      for (let i = 1; i < candidateArray.length; i++) {
+        const elem = candidateArray[i].trim();
 
-      // 유효성 검사
-      const allValid = candidateArray.every((s, index) => {
-        if (index === 0) {
-          const cleaned = s.replace(/^\n+/, "");
-          return cleaned.length > 0 && !isNaN(Number(cleaned));
-        } else {
-          const trimmed = s.trim();
-          return trimmed.length > 0 && !isNaN(Number(trimmed)) && !/\n/.test(s);
+        if (elem === "") {
+          isValid = false;
+          break;
         }
-      });
-      // console.log(
-      //   `len=${len}, pattern="${JSON.stringify(
-      //     pattern
-      //   )}", valid=${allValid}, array:`,
-      //   candidateArray
-      // );
 
-      if (!allValid) continue;
+        if (elem.length === 1) {
+          if (isNaN(Number(elem))) {
+            isValid = false;
+            break;
+          }
+        } else {
+          if (!/^\d/.test(elem) || !/\d$/.test(elem)) {
+            isValid = false;
+            break;
+          }
+        }
+      }
+      if (!isValid) continue;
 
+      const lastNumber = FindLastNumber.find(input);
+
+      if (pattern.length >= lastNumber.length + 3) {
+        continue
+      }
+
+      // 최적 패턴 선택
       const maxLen = Math.max(...candidateArray.map((s) => s.length));
       const arrLength = candidateArray.length;
 
@@ -82,10 +80,13 @@ class FindPattern {
         delimiter = JSON.stringify(pattern);
       }
     }
-
-    bestArray[0] = bestArray[0].replace("\n", "");
-    return bestArray;
+    console.log(delimiter);
+    // 안전하게 0번째 요소 '\n' 제거
+    if (bestArray && bestArray.length > 0) {
+      bestArray[0] = bestArray[0].replace("\n", "");
+    }
+    return bestArray || [];
   }
 }
 
-export default FindPattern;
+export default FindPatternTest;
