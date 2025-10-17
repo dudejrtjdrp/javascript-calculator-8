@@ -1,11 +1,3 @@
-// process.on("uncaughtException", (error) => {
-//   if (error.message.startsWith(ERROR_PREFIX)) {
-//     return
-//   } else {
-//     throw new Error(ERROR_PREFIX);
-//   }
-// });
-
 import StringCalculator from "./calculator/stringCalculator.js";
 import { ERROR_PREFIX } from "./util/constants.js";
 import InputHandler from "./view/inputHandler.js";
@@ -22,7 +14,7 @@ class App {
         error.message = `${ERROR_PREFIX}${error.message}`;
       }
       OutputHandler.printError(error);
-      throw new Error(error);
+      throw error;
     }
   }
 }

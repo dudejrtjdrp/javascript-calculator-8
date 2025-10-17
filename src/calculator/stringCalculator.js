@@ -4,36 +4,28 @@ import {
   EXCEPTION_NEWLINE,
   INVALID_FORMAT_ERROR,
 } from "../util/constants.js";
-import FindLastNumberBeforeDelimiter from "../util/findLastNumberBeforeDelimiter.js";
 import FindPattern from "../util/findPattern.js";
 
 class StringCalculator {
   static customCalculate(input) {
     input = input.replace(/\\n/g, "\n").slice(2);
+
     ValidateInput.custom(input);
-    let numbersArray = [];
 
     const match = input.match(CUSTOM_CHECKED_DELIMITER);
     const delimiter = match[1];
     const numbers = match[2];
-    console.log(match)
-    const hasDelimiterNumber = /\d/.test(delimiter);
     const countNewline = input.split(EXCEPTION_NEWLINE).length - 1;
-    console.log(hasDelimiterNumber && countNewline === 1)
-    if (hasDelimiterNumber && countNewline === 1) {
-      numbersArray = FindLastNumberBeforeDelimiter.find(
-        numbersArray,
-        numbers,
-        delimiter
-      );
-      console.log(numbersArray)
-      return numbersArray;
-    }
+    let numbersArray = [];
+
+    // 구분자에 개행문자가 들어갈 경우
     if (countNewline > 1) {
       numbersArray = FindPattern.find(input);
       return numbersArray;
     }
     numbersArray = numbers.split(delimiter);
+
+    // 개행문자가 반복되어 split시 배열에 빈칸이 생긴 경우
     if (numbersArray.includes("")) {
       throw new Error(INVALID_FORMAT_ERROR);
     }
@@ -46,6 +38,7 @@ class StringCalculator {
   }
   static calculate(input) {
     if (!input) return 0;
+    ValidateInput.common(input);
 
     let numbersArray = [];
     if (input.startsWith("//")) {
