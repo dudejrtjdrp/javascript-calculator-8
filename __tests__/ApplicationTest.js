@@ -44,6 +44,25 @@ describe("✅ 커스텀 구분자 테스트", () => {
   });
 });
 
+describe("✅ 커스텀 복잡한 구분자 테스트", () => {
+  test.each([
+    ["//;\n1;2;3", "결과 : 6"],
+    ["//-\n10-20-30", "결과 : 60"],
+    ["//***\n1***2***3", "결과 : 6"],
+    ["//@@@@\n1@@@@2@@@@3", "결과 : 6"],
+    ["//---===---\n1---===---2---===---3", "결과 : 6"],
+    ["//$$$$%%\n1$$$$%%2$$$$%%3", "결과 : 6"],
+    ["//^^^&&&^^^\n1^^^&&&^^^2^^^&&&^^^3", "결과 : 6"],
+    ["//<>><<>><>\n1<>><<>><>2<>><<>><>3", "결과 : 6"],
+  ])("입력: %s → %s", async (input, expected) => {
+    mockQuestions([input]);
+    const logSpy = getLogSpy();
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
+  });
+});
+
 describe("✅ 커스텀 구분자 + 숫자 조합", () => {
   test.each([
     ["//3\n132333", "결과 : 27"],
@@ -258,5 +277,189 @@ describe("❌ 예외 및 종료 테스트", () => {
     const app = new App();
 
     await expect(app.run()).rejects.toThrow("[ERROR]");
+  });
+});
+
+describe("✅ 정규식 특수문자 - 정상 처리되어야 함", () => {
+  test.each([
+    ["//.\n1.2.3", "결과 : 6"],
+    ["//*\n1*2*3", "결과 : 6"],
+    ["//+\n1+2+3", "결과 : 6"],
+    ["//?\n1?2?3", "결과 : 6"],
+    ["//^\n1^2^3", "결과 : 6"],
+    ["//$\n1$2$3", "결과 : 6"],
+    ["//|\n1|2|3", "결과 : 6"],
+    ["//[\n1[2[3", "결과 : 6"],
+    ["//]\n1]2]3", "결과 : 6"],
+    ["//(\n1(2(3", "결과 : 6"],
+    ["//)\n1)2)3", "결과 : 6"],
+    ["//{\n1{2{3", "결과 : 6"],
+    ["//}\n1}2}3", "결과 : 6"],
+    ["//\\\n1\\2\\3", "결과 : 6"],
+  ])("입력: %s → %s", async (input, expected) => {
+    mockQuestions([input]);
+    const logSpy = getLogSpy();
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
+  });
+});
+
+describe("✅ 다중 문자 패턴 - 정상 처리되어야 함", () => {
+  test.each([
+    ["//###\n1###2###3", "결과 : 6"],
+    ["//ABCABC\n1ABCABC2ABCABC3", "결과 : 6"],
+  ])("입력: %s → %s", async (input, expected) => {
+    mockQuestions([input]);
+    const logSpy = getLogSpy();
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
+  });
+});
+
+describe("✅ 특수 문자 조합 - 정상 처리되어야 함", () => {
+  test.each([
+    ["//!@#\n1!@#2!@#3", "결과 : 6"],
+    ["//<>\n1<>2<>3", "결과 : 6"],
+    ["//~`\n1~`2~`3", "결과 : 6"],
+    ["//%^\n1%^2%^3", "결과 : 6"],
+    ["//&*\n1&*2&*3", "결과 : 6"],
+    ["//=+\n1=+2=+3", "결과 : 6"],
+    ["//{}[]\n1{}[]2{}[]3", "결과 : 6"],
+  ])("입력: %s → %s", async (input, expected) => {
+    mockQuestions([input]);
+    const logSpy = getLogSpy();
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
+  });
+});
+
+describe("✅ 유니코드 문자 - 정상 처리되어야 함", () => {
+  test.each([
+    ["//😀\n1😀2😀3", "결과 : 6"],
+    ["//가\n1가2가3", "결과 : 6"],
+    ["//中\n1中2中3", "결과 : 6"],
+    ["//™\n1™2™3", "결과 : 6"],
+    ["//€\n1€2€3", "결과 : 6"],
+    ["//°\n1°2°3", "결과 : 6"],
+  ])("입력: %s → %s", async (input, expected) => {
+    mockQuestions([input]);
+    const logSpy = getLogSpy();
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
+  });
+});
+
+describe("✅ 공백 구분자 - 정상 처리되어야 함", () => {
+  test.each([
+    ["// \n1 2 3", "결과 : 6"],
+    ["//  \n1  2  3", "결과 : 6"],
+    ["// _ \n1 _ 2 _ 3", "결과 : 6"],
+    ["//   \n1   2   3", "결과 : 6"],
+  ])("입력: %s → %s", async (input, expected) => {
+    mockQuestions([input]);
+    const logSpy = getLogSpy();
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
+  });
+});
+
+describe("❌ 구분자에 숫자 포함 - 오류 발생해야 함", () => {
+  test.each([["//3a\n13a23a3"], ["//7x\n17x27x37x4"]])(
+    "입력: %s → [ERROR]",
+    async (input) => {
+      mockQuestions([input]);
+      const app = new App();
+      await expect(app.run()).rejects.toThrow("[ERROR]");
+    }
+  );
+});
+
+//예외처리해야됌
+describe("❌ 개행 문자 혼합 - 오류 발생해야 함", () => {
+  test("입력: //\\n\\n\\n1\\n2\\n3 → [ERROR]", async () => {
+    mockQuestions(["//\n\n\n1\n2\n3"]);
+    const app = new App();
+    await expect(app.run()).rejects.toThrow("[ERROR]");
+  });
+
+  describe("❌ 중첩 구분자 선언 - 오류 발생해야 함", () => {
+    test.each([["//a\n1a2a//aa\n1aa2"], ["//;\n1;2;//;;\n1;;2"]])(
+      "입력: %s → [ERROR]",
+      async (input) => {
+        mockQuestions([input]);
+        const app = new App();
+        await expect(app.run()).rejects.toThrow("[ERROR]");
+      }
+    );
+  });
+
+  describe("❌ 빈 데이터 / 경계 케이스 - 오류 발생해야 함", () => {
+    test.each([
+      ["//;\n"],
+      ["//;\n;"],
+      ["//;\n1;;2"],
+      ["//;\n;1;2;"],
+      ["//;\n;;;"],
+    ])("입력: %s → [ERROR]", async (input) => {
+      mockQuestions([input]);
+      const app = new App();
+      await expect(app.run()).rejects.toThrow("[ERROR]");
+    });
+  });
+
+
+  describe("❌ 혼합 구분자 - 오류 발생해야 함", () => {
+    test.each([["//|\n1|2/3"], ["//:\n1:2::3"]])(
+      "입력: %s → [ERROR]",
+      async (input) => {
+        mockQuestions([input]);
+        const app = new App();
+        await expect(app.run()).rejects.toThrow("[ERROR]");
+      }
+    );
+  });
+
+  describe("❌ NULL 바이트 / 제어문자 - 오류 발생해야 함", () => {
+    test("입력: NULL 바이트 구분자 → [ERROR]", async () => {
+      const nullByteInput = "//\x00\n1\x00" + "2\x00" + "3";
+      mockQuestions([nullByteInput]);
+      const app = new App();
+      await expect(app.run()).rejects.toThrow("[ERROR]");
+    });
+
+    test("입력: 유니코드 NULL 구분자 → [ERROR]", async () => {
+      mockQuestions(["//\u0000\n1\u00002"]);
+      const app = new App();
+      await expect(app.run()).rejects.toThrow("[ERROR]");
+    });
+  });
+
+  // 예외처리해야됌 - 구분자가 ! 하나여도 !! 뒤에 두개반복되서 오면 인지를 못함
+  // //;;\n1;;2;;;;3
+  // //abc\n1abc2abcabc3
+  // //123\n112323123
+  // 받은 input에서 //랑 \n이랑 모든 delimiter를 replaceAll로 바꿔줌
+  // 근데 숫자만 남는게 아니면 throw error어떰?
+
+
+  // //123\n112323123 지금 얘랑 null만 문제임 이거 해결해야댐
+  describe("❌ 복합 엣지 케이스 - 오류 발생해야 함", () => {
+    test.each([
+      ["//--\n1--2--//--\n1--2"],
+      ["//;;\n1;;2;;;;3"],
+      ["//abc\n1abc2abcabc3"],
+      ["//123\n112323123"],
+      ["//..\n1..2....3"],
+      ["//***\n1***2**3*4"],
+    ])("입력: %s → [ERROR]", async (input) => {
+      mockQuestions([input]);
+      const app = new App();
+      await expect(app.run()).rejects.toThrow("[ERROR]");
+    });
   });
 });

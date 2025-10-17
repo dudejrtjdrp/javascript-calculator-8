@@ -2,6 +2,7 @@ import ValidateInput from "../util/validateInput.js";
 import {
   CUSTOM_CHECKED_DELIMITER,
   EXCEPTION_NEWLINE,
+  INVALID_FORMAT_ERROR,
 } from "../util/constants.js";
 import FindLastNumberBeforeDelimiter from "../util/findLastNumberBeforeDelimiter.js";
 import FindPattern from "../util/findPattern.js";
@@ -10,23 +11,32 @@ class StringCalculator {
   static customCalculate(input) {
     input = input.replace(/\\n/g, "\n").slice(2);
     ValidateInput.custom(input);
-    console.log(ValidateInput.custom(input))
     let numbersArray = [];
 
     const match = input.match(CUSTOM_CHECKED_DELIMITER);
     const delimiter = match[1];
     const numbers = match[2];
+    console.log(match)
     const hasDelimiterNumber = /\d/.test(delimiter);
     const countNewline = input.split(EXCEPTION_NEWLINE).length - 1;
-    if (hasDelimiterNumber && countNewline == 1) {
+    console.log(hasDelimiterNumber && countNewline === 1)
+    if (hasDelimiterNumber && countNewline === 1) {
       numbersArray = FindLastNumberBeforeDelimiter.find(
         numbersArray,
         numbers,
         delimiter
       );
+      console.log(numbersArray)
       return numbersArray;
     }
-    numbersArray = FindPattern.find(input);
+    if (countNewline > 1) {
+      numbersArray = FindPattern.find(input);
+      return numbersArray;
+    }
+    numbersArray = numbers.split(delimiter);
+    if (numbersArray.includes("")) {
+      throw new Error(INVALID_FORMAT_ERROR);
+    }
     return numbersArray;
   }
   static defaultCalculate(input) {

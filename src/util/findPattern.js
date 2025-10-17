@@ -1,22 +1,28 @@
-import { EXCEPTION_NEWLINE } from "./constants.js";
+import FindLastNumber from "./findLastNumber.js";
 
 class FindPatternTest {
+  static checkFinalArray(input, numberArray, pattern) {}
   static splitByPattern(input, pattern) {
     if (!input) return [];
     return input.split(pattern);
   }
-
   static find(input) {
     let bestArray = null;
     let bestMaxLength = Infinity;
     let bestArrayLength = -1;
     let delimiter = "";
+    let notPattern = "";
 
     for (let len = 1; len <= input.length; len++) {
       const pattern = input.slice(0, len);
       let candidateArray = this.splitByPattern(input, pattern);
 
       if (!candidateArray || candidateArray.length === 0) continue;
+
+      if (candidateArray.filter((item) => item === "").length >= 3) {
+        notPattern = pattern;
+        continue;
+      }
 
       // 0️⃣ 앞쪽 빈칸 제거 (숫자 나올 때까지)
       while (candidateArray.length > 0 && candidateArray[0].trim() === "") {
@@ -53,6 +59,13 @@ class FindPatternTest {
         }
       }
       if (!isValid) continue;
+
+      const lastNumber = FindLastNumber.find(input);
+
+      if (pattern.length >= lastNumber.length + 3) {
+        continue
+      }
+
       // 최적 패턴 선택
       const maxLen = Math.max(...candidateArray.map((s) => s.length));
       const arrLength = candidateArray.length;
@@ -67,7 +80,7 @@ class FindPatternTest {
         delimiter = JSON.stringify(pattern);
       }
     }
-
+    console.log(delimiter);
     // 안전하게 0번째 요소 '\n' 제거
     if (bestArray && bestArray.length > 0) {
       bestArray[0] = bestArray[0].replace("\n", "");

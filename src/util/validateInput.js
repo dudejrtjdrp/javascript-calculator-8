@@ -6,6 +6,7 @@ import {
   EMPTY_DELIMITER_ERROR,
   INVALID_DELIMITER_ERROR,
 } from "./constants.js";
+import EscapeRegex from "./escapeRegex.js";
 
 class ValidateInput {
   static common(input) {
@@ -18,13 +19,29 @@ class ValidateInput {
     const match = input.match(CUSTOM_CHECKED_DELIMITER);
 
     if (match) {
-      const [, delimiter, numbersPart] = match;
+      const [, delimiter, numbers] = match;
 
+      const numbersArray = numbers.split(delimiter);
+      if (numbersArray.some((element) => element.trim() === "")) {
+        throw new Error(INVALID_FORMAT_ERROR);
+      }
       // 구분자가 아닌 다른 문자가 섞여 있으면 에러
-      const invalidPattern = new RegExp(`[^0-9${delimiter}\n]`);
-      if (invalidPattern.test(numbersPart)) {
+      const invalidPattern = new RegExp(
+        `[^0-9\\.\\n${EscapeRegex.escape(delimiter)}]`
+      );
+      if (invalidPattern.test(numbers)) {
+        console.log(111);
         throw new Error(INVALID_DELIMITER_ERROR);
       }
+
+      const numberPattern = /^\d+(\.\d+)?$/; // 양수 + 소수 허용, 음수 X
+      // numbersPart.split(delimiter).forEach((numStr) => {
+      //   const trimmed = numStr.trim();
+      //   if (!numberPattern.test(trimmed)) {
+      //     console.log(numbersPart)
+      //     throw new Error(INVALID_DELIMITER_ERROR);
+      //   }
+      // });
     }
 
     if (!match) {
