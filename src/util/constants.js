@@ -1,10 +1,13 @@
 export const CUSTOM_CHECKED_DELIMITER = /^([\s\S]+?)\n([\s\S]*)$/;
 export const DEFAULT_CHECKED_DELIMITER = /([,:]{2,})|^[,:]|[,:]$/;
-export const EXCEPTION_NEWLINE = "\n";
-export const ERROR_PREFIX = "[ERROR]"
-export const INVALID_FORMAT_ERROR = "[ERROR] 입력 형식이 올바르지 않습니다."
-export const NEGATIVE_NUMBER_ERROR = "[ERROR] 음수는 허용되지 않습니다."
-export const EMPTY_DELIMITER_ERROR  = "[ERROR] 커스텀 구분자가 빈 문자열입니다."
-export const NUMBER_DELIMITER_ERROR = "[ERROR] 구분자는 숫자로만 구성할 수 없습니다."
-export const SIDE_NUMBER_DELIMITER_ERROR = "[ERROR] 구분자는 숫자로 시작하거나 끝날수 없습니다."
-export const INVALID_DELIMITER_ERROR = "[ERROR] 구분자 외의 문자가 포함되어 있습니다."
+export const EXCEPTION_NEWLINE = '\n';
+export const ERROR_PREFIX = '[ERROR]';
+export const INVALID_FORMAT_ERROR = '[ERROR] 입력 형식이 올바르지 않습니다.';
+export const NEGATIVE_NUMBER_ERROR = '[ERROR] 음수는 허용되지 않습니다.';
+export const EMPTY_DELIMITER_ERROR = '[ERROR] 커스텀 구분자가 빈 문자열입니다.';
+export const NUMBER_DELIMITER_ERROR =
+  '[ERROR] 구분자는 숫자로만 구성할 수 없습니다.';
+export const SIDE_NUMBER_DELIMITER_ERROR =
+  '[ERROR] 구분자는 숫자로 시작하거나 끝날수 없습니다.';
+export const INVALID_DELIMITER_ERROR =
+  '[ERROR] 구분자 외의 문자가 포함되어 있습니다.';
