@@ -1,5 +1,6 @@
 import FindLastNumber from './findLastNumber.js';
 
+// 커스텀 구분자에 개행 문자가 들어올 경우
 class FindPatternTest {
   static splitByPattern(input, pattern) {
     if (!input) return [];

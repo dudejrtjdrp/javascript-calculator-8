@@ -11,7 +11,6 @@ class StringCalculator {
     const slicedInput = input.replace(/\\n/g, '\n').slice(2);
 
     ValidateInput.custom(slicedInput);
-
     const match = slicedInput.match(CUSTOM_CHECKED_DELIMITER);
     const delimiter = match[1];
     const numbers = match[2];
