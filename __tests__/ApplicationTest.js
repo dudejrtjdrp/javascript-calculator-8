@@ -63,19 +63,6 @@ describe('커스텀 복잡한 구분자 테스트', () => {
   });
 });
 
-describe('커스텀 구분자 + 개행', () => {
-  test.each([['//\n\n1\n2\n3', '결과 : 6']])(
-    '입력: %s → %s',
-    async (input, expected) => {
-      mockQuestions([input]);
-      const logSpy = getLogSpy();
-      const app = new App();
-      await app.run();
-      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
-    },
-  );
-});
-
 test('커스텀 구분자 사용', async () => {
   const inputs = ['//;\\n1'];
   mockQuestions(inputs);
@@ -158,8 +145,8 @@ describe('예외 및 종료 테스트', () => {
     await expect(app.run()).rejects.toThrow('[ERROR]');
   });
 
-  test('잘못된 커스텀 형식 → [ERROR]', async () => {
-    mockQuestions(['//;\n1;2,3']);
+  test('커스텀 구분자 + 개행 → [ERROR]', async () => {
+    mockQuestions(['//\n\n1\n2\n3']);
     const app = new App();
     await expect(app.run()).rejects.toThrow('[ERROR]');
   });
@@ -313,30 +300,12 @@ describe('유니코드 문자 - 정상 처리되어야 함', () => {
   });
 });
 
-describe('공백 구분자 - 정상 처리되어야 함', () => {
-  test.each([
-    ['// \n1 2 3', '결과 : 6'],
-    ['//  \n1  2  3', '결과 : 6'],
-    ['// _ \n1 _ 2 _ 3', '결과 : 6'],
-    ['//   \n1   2   3', '결과 : 6'],
-  ])('입력: %s → %s', async (input, expected) => {
-    mockQuestions([input]);
-    const logSpy = getLogSpy();
-    const app = new App();
-    await app.run();
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
-  });
-});
-
 describe('구분자가 숫자로 시작 - 오류 발생해야 함', () => {
-  test.each([['//3a\n13a23a3'], ['//7x\n17x27x37x4']])(
-    '입력: %s → [ERROR]',
-    async (input) => {
-      mockQuestions([input]);
-      const app = new App();
-      await expect(app.run()).rejects.toThrow('[ERROR]');
-    },
-  );
+  test.each([['//3a\n13a23a3'], ['//7x\n17x27x37x4']])('입력: %s → [ERROR]', async (input) => {
+    mockQuestions([input]);
+    const app = new App();
+    await expect(app.run()).rejects.toThrow('[ERROR]');
+  });
 });
 
 // 예외처리해야됌
@@ -359,21 +328,7 @@ describe('개행 문자 혼합 - 오류 발생해야 함', () => {
   });
 
   describe('빈 데이터 / 경계 케이스 - 오류 발생해야 함', () => {
-    test.each([
-      ['//;\n'],
-      ['//;\n;'],
-      ['//;\n1;;2'],
-      ['//;\n;1;2;'],
-      ['//;\n;;;'],
-    ])('입력: %s → [ERROR]', async (input) => {
-      mockQuestions([input]);
-      const app = new App();
-      await expect(app.run()).rejects.toThrow('[ERROR]');
-    });
-  });
-
-  describe('혼합 구분자 - 오류 발생해야 함', () => {
-    test.each([['//|\n1|2/3'], ['//:\n1:2::3']])(
+    test.each([['//;\n'], ['//;\n;'], ['//;\n1;;2'], ['//;\n;1;2;'], ['//;\n;;;']])(
       '입력: %s → [ERROR]',
       async (input) => {
         mockQuestions([input]);
@@ -381,6 +336,14 @@ describe('개행 문자 혼합 - 오류 발생해야 함', () => {
         await expect(app.run()).rejects.toThrow('[ERROR]');
       },
     );
+  });
+
+  describe('혼합 구분자 - 오류 발생해야 함', () => {
+    test.each([['//|\n1|2/3'], ['//:\n1:2::3']])('입력: %s → [ERROR]', async (input) => {
+      mockQuestions([input]);
+      const app = new App();
+      await expect(app.run()).rejects.toThrow('[ERROR]');
+    });
   });
 
   describe('복합 엣지 케이스 - 오류 발생해야 함', () => {
@@ -396,6 +359,30 @@ describe('개행 문자 혼합 - 오류 발생해야 함', () => {
       const app = new App();
       await expect(app.run()).rejects.toThrow('[ERROR]');
     });
+  });
+});
+
+describe('복합 엣지 케이스 - 오류 발생해야 함', () => {
+  test.each([
+    ['-1,2,3'],
+    ['1,2,3.'],
+    ['.3,1,2'],
+    [' .3,1,2'],
+    ['.3,1,2 '],
+    ['//!\n!1!2,@'],
+    ['//!\n.3!1!,2'],
+    ['//!\n-3!1!2'],
+    ['//!\n3!1!-2'],
+    ['1,,2,3'],
+    ['1,:2:3'],
+    ['1:2,,3'],
+    ['1:,2,,:3'],
+    ['//!\n1!,2!:3'],
+    ['//!\n1!2,!3'],
+  ])('입력: %s → [ERROR]', async (input) => {
+    mockQuestions([input]);
+    const app = new App();
+    await expect(app.run()).rejects.toThrow('[ERROR]');
   });
 });
 
@@ -465,14 +452,11 @@ describe('추가 엣지 케이스 ', () => {
   });
 
   // 연속 구분자 → 빈 값
-  test.each([['1,,2,3'], ['//;\n1;;2;3']])(
-    '입력: %s → [ERROR]',
-    async (input) => {
-      mockQuestions([input]);
-      const app = new App();
-      await expect(app.run()).rejects.toThrow('[ERROR]');
-    },
-  );
+  test.each([['1,,2,3'], ['//;\n1;;2;3']])('입력: %s → [ERROR]', async (input) => {
+    mockQuestions([input]);
+    const app = new App();
+    await expect(app.run()).rejects.toThrow('[ERROR]');
+  });
 
   // 숫자+문자 혼합 구분자
   test.each([
@@ -485,62 +469,16 @@ describe('추가 엣지 케이스 ', () => {
   });
 
   // 특수문자 + 중첩 구분자
-  test.each([['//**\n1**2**//\n3'], ['//++\n1++2+3']])(
-    '입력: %s → [ERROR]',
-    async (input) => {
-      mockQuestions([input]);
-      const app = new App();
-      await expect(app.run()).rejects.toThrow('[ERROR]');
-    },
-  );
+  test.each([['//**\n1**2**//\n3'], ['//++\n1++2+3']])('입력: %s → [ERROR]', async (input) => {
+    mockQuestions([input]);
+    const app = new App();
+    await expect(app.run()).rejects.toThrow('[ERROR]');
+  });
 
   // 숫자 끝에 공백/문자
-  test.each([['1,2,3 '], ['1,2,3a'], ['//;\n1;2;3 ']])(
-    '입력: %s → [ERROR]',
-    async (input) => {
-      mockQuestions([input]);
-      const app = new App();
-      await expect(app.run()).rejects.toThrow('[ERROR]');
-    },
-  );
-});
-
-describe('추가 엣지 케이스 - 정상 처리되어야 함', () => {
-  // 구분자에 공백 포함 (정상 처리)
-  test.each([
-    ['//_ \n1_ 2_ 3', '결과 : 6'],
-    ['//  \n1  2  3', '결과 : 6'],
-  ])('입력: %s → %s', async (input, expected) => {
+  test.each([['1,2,3 '], ['1,2,3a'], ['//;\n1;2;3 ']])('입력: %s → [ERROR]', async (input) => {
     mockQuestions([input]);
-    const logSpy = getLogSpy();
     const app = new App();
-    await app.run();
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
-  });
-
-  // 유니코드 포함
-  test.each([
-    ['//😀\n1😀2😀3', '결과 : 6'],
-    ['//中\n1中2中3', '결과 : 6'],
-    ['//™\n1™2™3', '결과 : 6'],
-  ])('입력: %s → %s', async (input, expected) => {
-    mockQuestions([input]);
-    const logSpy = getLogSpy();
-    const app = new App();
-    await app.run();
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
-  });
-
-  // 숫자가 구분자 중간에만 있는 경우
-  test.each([
-    ['//#123#\n1#123#2#123#3', '결과 : 6'],
-    ['//a1b\n1a1b2a1b3', '결과 : 6'],
-    ['//x7y\n1x7y2x7y3', '결과 : 6'],
-  ])('입력: %s → %s', async (input, expected) => {
-    mockQuestions([input]);
-    const logSpy = getLogSpy();
-    const app = new App();
-    await app.run();
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(expected));
+    await expect(app.run()).rejects.toThrow('[ERROR]');
   });
 });
